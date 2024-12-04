@@ -1,67 +1,43 @@
-import re
 import requests
-import random
 import time
 
-def vote(url, use_id, n):
-    """为指定的 useID 投票，并打印调试信息"""
-    ip = [i for i in range(1, 256)]
-    for i in range(n):
-        # 随机生成 Fake_IP 地址
-        Fake_Ip = '192.168.{}.{}'.format(random.choice(ip), random.choice(ip))
-        print(f'Fake_IP: {Fake_Ip}')
-        
-        # POST 请求数据和请求头
-        datas = {'useID': use_id}
-        headers = {
-            'Accept': 'text/plain, */*; q=0.01',
-            'Accept-Encoding': 'gzip, deflate',
-            'Accept-Language': 'zh-CN,zh;q=0.9',
-            'Content-Length': str(len(str(datas))),
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Host': '00d6d6.lanh.love',
-            'Origin': 'https://00d6d6.lanh.love',
-            'Proxy-Connection': 'keep-alive',
-            'Referer': 'https://00d6d6.lanh.love/107/#/vote?act=8828',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.87 Safari/537.36',
-            'X-Requested-With': 'XMLHttpRequest',
-            'X-Real-Ip': Fake_Ip,
-            'X-Forwarded-For': Fake_Ip
-        }
-        try:
-            # 发起 POST 请求
-            response = requests.post(url, headers=headers, data=datas)
-            
-            # 打印调试信息：完整响应内容
-            print(f"响应状态码: {response.status_code}")
-            print(f"响应内容: {response.text}")
-            
-            # 提取票数信息
-            votes_num = re.search(r'\d+', response.text)
-            if votes_num:
-                print(f'成功投票给 useID={use_id}，当前票数：{votes_num.group(0)}')
-            else:
-                print('投票响应解析失败')
-            
-            # 延时以避免触发反刷票机制
-            time.sleep(random.uniform(2, 5))  # 随机等待 2-5 秒
-            
-        except Exception as e:
-            print(f'投票失败，错误信息：{e}')
+def vote_with_cookies(vote_url, use_id, cookies):
+    """
+    使用登录后的 Cookies 为指定 useID 投票
+    """
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.87 Safari/537.36',
+        'Referer': 'https://00d6d6.lanh.love/107/#/vote?act=8828',
+    }
+    data = {'useID': use_id}  # 提交投票的目标 ID
+    try:
+        response = requests.post(vote_url, headers=headers, cookies=cookies, data=data)
+        if response.status_code == 200:
+            print(f"投票成功！响应内容: {response.text}")
+        else:
+            print(f"投票失败！状态码: {response.status_code}, 响应内容: {response.text}")
+    except Exception as e:
+        print(f"投票过程中发生错误: {e}")
 
 def main():
-    """主函数"""
-    try:
-        # 设置目标 URL 和投票 useID
-        vote_url = 'https://00d6d6.lanh.love/107/#/vote?act=8828'
-        target_use_id = 267877
-        
-        # 开始投票
-        print(f'开始为 useID={target_use_id} 投票...')
-        for _ in range(10):  # 这里设置为 10 次投票，用于测试
-            vote(vote_url, target_use_id, 1)
-    except Exception as e:
-        print(f'程序运行出错，错误信息：{e}')
+    """
+    主函数：循环投票
+    """
+    # 投票 URL 和目标 useID
+    vote_url = 'https://00d6d6.lanh.love/107/#/vote?act=8828'
+    use_id = 267877
+
+    # 登录后从浏览器开发者工具中获取的 Cookies
+    cookies = {
+        'sessionid': 'your_session_id',  # 替换为登录后真实的 session ID
+        # 根据实际需要添加其他 Cookies，如 csrftoken、auth_token 等
+    }
+
+    # 循环投票
+    for i in range(10):  # 这里设置为投票 10 次，可根据需要调整
+        print(f"正在进行第 {i+1} 次投票...")
+        vote_with_cookies(vote_url, use_id, cookies)
+        time.sleep(2)  # 增加间隔时间，模拟真实用户行为
 
 if __name__ == '__main__':
     main()
