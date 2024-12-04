@@ -1,9 +1,10 @@
 import re
 import requests
 import random
+import time
 
 def vote(url, use_id, n):
-    """为指定的 useID 进行投票"""
+    """为指定的 useID 投票，并打印调试信息"""
     ip = [i for i in range(1, 256)]
     for i in range(n):
         # 随机生成 Fake_IP 地址
@@ -30,12 +31,21 @@ def vote(url, use_id, n):
         try:
             # 发起 POST 请求
             response = requests.post(url, headers=headers, data=datas)
+            
+            # 打印调试信息：完整响应内容
+            print(f"响应状态码: {response.status_code}")
+            print(f"响应内容: {response.text}")
+            
             # 提取票数信息
             votes_num = re.search(r'\d+', response.text)
             if votes_num:
                 print(f'成功投票给 useID={use_id}，当前票数：{votes_num.group(0)}')
             else:
                 print('投票响应解析失败')
+            
+            # 延时以避免触发反刷票机制
+            time.sleep(random.uniform(2, 5))  # 随机等待 2-5 秒
+            
         except Exception as e:
             print(f'投票失败，错误信息：{e}')
 
@@ -48,7 +58,7 @@ def main():
         
         # 开始投票
         print(f'开始为 useID={target_use_id} 投票...')
-        for _ in range(300):  # 投票 300 次，每次 1 票
+        for _ in range(10):  # 这里设置为 10 次投票，用于测试
             vote(vote_url, target_use_id, 1)
     except Exception as e:
         print(f'程序运行出错，错误信息：{e}')
