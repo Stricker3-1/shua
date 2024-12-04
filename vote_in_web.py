@@ -18,7 +18,7 @@ def read_num(html):
 def get_page(url):
 	try:
 		headers = {
-			'Referer': 'http://www.fm169.cn/mvvotes.html',  # 伪装
+			'Referer': 'https://00d6d6.lanh.love/107/#/vote?act=8828',  # 伪装
 			'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.87 Safari/537.36'  # 伪装成浏览器
 		}
 		response = requests.get(url, headers=headers)
@@ -55,7 +55,7 @@ def vote(url, n):
 		for i in range(n):
 			response = requests.post(url, headers=header, data = datas)
 			votes_num = int(re.compile('.*?(\d+).*?').search(response.text).group(1))
-		print('给兵哥哥怒投5票，当前票数：',votes_num)
+		print('给兵哥哥怒投5票，当前票数：',votes_5)
 
 	except Exception:
 		print('传参出错')
@@ -63,8 +63,8 @@ def vote(url, n):
 def main():
 
 	try:
-		url = 'http://www.fm169.cn/musicvotelist_s7132.html'  # 网页浏览的url
-		url2 = 'http://www.fm169.cn/zanmusics.html'  # 待刷票数的url
+		url = 'https://00d6d6.lanh.love/107/#/vote?act=8828'  # 网页浏览的url
+		url2 = 'https://00d6d6.lanh.love/107/#/detailsInfo?act=8828&useID=267877'  # 待刷票数的url
 		for i in range(300):
 			vote(url2,5)
 			# get_page(url) #浏览网页
